@@ -5,18 +5,13 @@ Configuration and utility scripts for Arch linux and my typical workflow
 
 ## Tech Stack
 
-- dwm ( tiling window manager )
-- picom ( compositor ) 
-- dunst ( notification manager )
-- vim (neovim) (IDE)
-- zsh ( shell )
-- alacritty ( Terminal emulator )
 
-| Item                  |   Description         |
-|------------------------|----------------------|
-| dwm                   | titling window manager |
-| picom                 | compositor            |
-| dunst                 | notification manager |
-| vim ( neovim )        | IDE / Text Editor |
-| zsh                   | shell                 |
-| alacritty             | fast as fuck terminal emulator |
+| Item                                                  |   Description                             |
+|-------------------------------------------------------|-------------------------------------------|
+| [dwm](https://github.com/kgmyatthu/dwm)               | my fork of suckless titling window manager|
+| [picom](https://github.com/ibhagwan/picom)            | compositor                                |
+| [dunst](https://github.com/dunst-project/dunst)       | notification daemon                       |
+| [vim ( neovim )](https://github.com/neovim/neovim)    | IDE / Text Editor                         |
+| [zsh]()                                               | shell                                     |
+| [alacritty](https://github.com/alacritty/alacritty)   | terminal emulator                         |
+| [tmux](https://github.com/tmux/tmux)                  | terminal multiplexer                      |
