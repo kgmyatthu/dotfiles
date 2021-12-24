@@ -15,6 +15,7 @@ xrandr --output HDMI-0 --primary --mode 1920x1080 --rate 74.97 --output eDP-1-1 
 nitrogen --restore &
 dunst &
 systemctl --user import-environment DISPLAY &
+# while true;  do  /usr/local/bin/dwm > /dev/null; done;
 dash ~/.config/dwm/bar.sh & 
 eww daemon &
-while true;  do  /usr/local/bin/dwm > /dev/null; done;
+dwm; 
