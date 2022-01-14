@@ -1,8 +1,9 @@
 
 call plug#begin('~/.config/nvim/plugins')
-Plug 'ap/vim-css-color' "css color helper
-Plug 'christianchiarulli/nvcode-color-schemes.vim' "color theme
 Plug 'nvim-treesitter/nvim-treesitter' "syntax hightlight 
+Plug 'christianchiarulli/nvcode-color-schemes.vim' "color theme
+Plug 'p00f/nvim-ts-rainbow' " bracket colorizer
+Plug 'ap/vim-css-color' "css color helper
 
 " Language server and auto completion plugins
 Plug 'neovim/nvim-lspconfig' " built-in LSP
@@ -19,7 +20,7 @@ Plug 'vim-airline/vim-airline' "status bar
 Plug 'lukas-reineke/indent-blankline.nvim' "indent indicator
 Plug 'kyazdani42/nvim-web-devicons' "colored icons
 Plug 'akinsho/bufferline.nvim' "visual studio code styles tabs
-Plug 'kyazdani42/nvim-web-devicons' "colored icons
+Plug 'ryanoasis/vim-devicons'
 
 Plug 'kyazdani42/nvim-tree.lua' " file explorer
 
@@ -27,7 +28,6 @@ Plug 'nvim-lua/plenary.nvim' " don't know what this it but needed for telescope
 Plug 'nvim-telescope/telescope.nvim' " fuzzy finder
 Plug 'nvim-telescope/telescope-media-files.nvim' " media preview for telescope
 
-" Plug 'glacambre/firenvim', { 'do': { _ -> firenvim#install(0) } } " embed neovim in browsers ( chrome/ firefox )
 Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']} " markdown preview
 call plug#end()
 
@@ -58,12 +58,18 @@ vnoremap <A-j> :m '>+1<CR>gv=gv
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Splits and Tabbed Files
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set splitbelow splitright
+set splitbelow
 " Make adjusing split sizes a bit more friendly
 noremap <silent> <C-Left> :vertical resize +3<CR>
 noremap <silent> <C-Right> :vertical resize -3<CR>
 noremap <silent> <C-Up> :resize +3<CR>
 noremap <silent> <C-Down> :resize -3<CR>
+
+set termguicolors
+syntax on
+highlight Pmenu guibg=None
+highlight Normal guibg=none
+highlight NonText guibg=none
 
 "treesitter (syntax hightlight) and color scheme configs 
 lua << EOF
@@ -73,15 +79,18 @@ require'nvim-treesitter.configs'.setup {
     enable = true,              -- false will disable the whole extension
     disable = { "rust" },  -- list of language that will be disabled
   },
-
+    rainbow = {
+        enable = true,
+        -- disable = { "jsx", "cpp" }, list of languages you want to disable the plugin for
+        extended_mode = true, -- Also highlight non-bracket delimiters like html tags, boolean or table: lang -> boolean
+        max_file_lines = nil, -- Do not enable for files with more than n lines, int
+        -- colors = {}, -- table of hex strings
+        -- termcolors = {} -- table of colour name strings
+      }
 }
 EOF
 
-set termguicolors
-syntax on
-colorscheme nvcode 
-highlight Normal guibg=none
-highlight NonText guibg=none
+
 """""""""""""""""""""
 " setup comment toggler
 lua require('nvim_comment').setup()
@@ -96,13 +105,14 @@ let g:airline#extensions#branch#enabled = 1
 " built in LSP keybindings and auto completion setup
 nnoremap <silent> gd <cmd>lua vim.lsp.buf.definition()<CR>
 nnoremap <silent> gD <cmd>lua vim.lsp.buf.declaration()<CR>
-nnoremap <silent> gr <cmd>lua vim.lsp.bu.references()<CR>
+nnoremap <silent> gr <cmd>lua vim.lsp.buf.references()<CR>
 nnoremap <silent> gi <cmd>lua vim.lsp.buf.implementation()<CR>
 nnoremap <silent> K <cmd>lua vim.lsp.buf.hover()<CR>
 nnoremap <silent> <F2> <cmd>lua vim.lsp.buf.rename()<CR>
 nnoremap <silent> <C-k> <cmd>lua vim.lsp.buf.signature_hlp()<CR>
 nnoremap <silent> <C-n> <cmd>lua vim.lsp.diagnostic.goto_prev()<CR>
 nnoremap <silent> <C-p> <cmd>lua vim.lsp.diagnostic.goto_next()<CR>
+
 " lsp auto installer setup
 lua << EOF
 local lsp_installer = require("nvim-lsp-installer")
@@ -125,15 +135,11 @@ lua << EOF
 local lsp = require "lspconfig"
 local coq = require "coq" 
 
-lsp.tsserver.setup{}
 lsp.tsserver.setup(coq.lsp_ensure_capabilities{})
-
+lsp.eslint.setup(coq.lsp_ensure_capabilities{})
 lsp.cssls.setup(coq.lsp_ensure_capabilities{})
-
 lsp.vimls.setup(coq.lsp_ensure_capabilities{})
-
 lsp.clangd.setup(coq.lsp_ensure_capabilities{})
-
 lsp.pyright.setup(coq.lsp_ensure_capabilities{})
 vim.cmd('COQnow -s')
 EOF
@@ -142,18 +148,6 @@ EOF
 "visuallize git dif
 lua require'diffview'.setup{}
 
-
-"nvim-cmp autocompletion setup 
-
-" blankline indent setup 
-lua << EOF
-vim.opt.list = true
-vim.opt.listchars:append("eol:↴")
-require("indent_blankline").setup {
-    space_char_blankline = " ",
-    show_current_context = true,
-}
-EOF
 
 "vscode style tabs (bufferline plugin) setup 
 nnoremap <silent> <A-n> :BufferLineCycleNext<CR>
