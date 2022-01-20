@@ -65,30 +65,33 @@ noremap <silent> <C-Right> :vertical resize -3<CR>
 noremap <silent> <C-Up> :resize +3<CR>
 noremap <silent> <C-Down> :resize -3<CR>
 
-set termguicolors
-syntax on
-highlight Pmenu guibg=None
-highlight Normal guibg=none
-highlight NonText guibg=none
+
 
 "treesitter (syntax hightlight) and color scheme configs 
 lua << EOF
-require'nvim-treesitter.configs'.setup {
-  ensure_installed = "all", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
-  highlight = {
-    enable = true,              -- false will disable the whole extension
-    disable = { "rust" },  -- list of language that will be disabled
-  },
-    rainbow = {
-        enable = true,
-        -- disable = { "jsx", "cpp" }, list of languages you want to disable the plugin for
-        extended_mode = true, -- Also highlight non-bracket delimiters like html tags, boolean or table: lang -> boolean
-        max_file_lines = nil, -- Do not enable for files with more than n lines, int
-        -- colors = {}, -- table of hex strings
-        -- termcolors = {} -- table of colour name strings
-      }
-}
+ require'nvim-treesitter.configs'.setup {
+   ensure_installed = "maintained", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
+   highlight = {
+     enable = true,              -- false will disable the whole extension
+     disable = { "" },  -- list of language that will be disabled
+   },
+     rainbow = {
+         enable = true,
+         -- disable = { "jsx", "cpp" }, list of languages you want to disable the plugin for
+         extended_mode = true, -- Also highlight non-bracket delimiters like html tags, boolean or table: lang -> boolean
+         max_file_lines = nil, -- Do not enable for files with more than n lines, int
+         -- colors = {}, -- table of hex strings
+         -- termcolors = {} -- table of colour name strings
+       }
+ }
 EOF
+
+set termguicolors
+syntax on
+highlight Pmenu guibg=#0300b3
+highlight PmenuSel guibg=#00FFFF guifg=#000000
+highlight Normal guibg=none
+highlight NonText guibg=none
 
 
 """""""""""""""""""""
@@ -253,3 +256,4 @@ require'nvim-tree'.setup {
   }
 }
 EOF
+
