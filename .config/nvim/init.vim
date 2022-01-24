@@ -4,6 +4,7 @@ Plug 'nvim-treesitter/nvim-treesitter' "syntax hightlight
 Plug 'christianchiarulli/nvcode-color-schemes.vim' "color theme
 Plug 'p00f/nvim-ts-rainbow' " bracket colorizer
 Plug 'ap/vim-css-color' "css color helper
+Plug 'pragmaticarun/turbocpp.vim'
 
 " Language server and auto completion plugins
 Plug 'neovim/nvim-lspconfig' " built-in LSP
@@ -115,6 +116,8 @@ nnoremap <silent> <F2> <cmd>lua vim.lsp.buf.rename()<CR>
 nnoremap <silent> <C-k> <cmd>lua vim.lsp.buf.signature_hlp()<CR>
 nnoremap <silent> <C-n> <cmd>lua vim.lsp.diagnostic.goto_prev()<CR>
 nnoremap <silent> <C-p> <cmd>lua vim.lsp.diagnostic.goto_next()<CR>
+nnoremap <silent> ca <cmd>lua vim.lsp.buf.code_action()<CR>
+
 
 " lsp auto installer setup
 lua << EOF
