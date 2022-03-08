@@ -12,12 +12,12 @@ env:
 window:
   # Spread additional padding evenly around the terminal content.
   padding:
-    x: 10
-    y: 10
+    x: 5
+    y: 5
   # Remove buttons
   decorations: none
   # Open in full screen 
-  startup_mode: Maximized
+  # startup_mode: Maximized
   # Dimensions if not SimpleFullscreen
   dimensions:
     columns: 140
@@ -33,6 +33,7 @@ cursor:
 font:
   normal:
     family: FiraCode Nerd Font 
+    # family: UbuntuMono Nerd Font
   size: 8.5
 
   # Better font rendering for mac

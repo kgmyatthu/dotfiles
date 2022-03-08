@@ -1,4 +1,3 @@
-
 call plug#begin('~/.config/nvim/plugins')
 Plug 'nvim-treesitter/nvim-treesitter' "syntax hightlight 
 Plug 'christianchiarulli/nvcode-color-schemes.vim' "color theme
@@ -11,11 +10,14 @@ Plug 'neovim/nvim-lspconfig' " built-in LSP
 Plug 'williamboman/nvim-lsp-installer' " language server auto installer
 Plug 'ms-jpq/coq_nvim', {'branch': 'coq'} "auto completion tool
 Plug 'ms-jpq/coq.artifacts', {'branch': 'artifacts'} " 9000+ snippet
+Plug 'weilbith/nvim-code-action-menu' "codeaction menu
+Plug 'tpope/vim-sleuth' "auto indent space detector
+Plug 'mfussenegger/nvim-dap' "debugging support 
+Plug 'rcarriga/nvim-dap-ui' "nvim-dap ui support
 
 Plug 'terrortylor/nvim-comment' " comment toggler
 
 Plug 'tpope/vim-fugitive' "git commands in neovim
-Plug 'sindrets/diffview.nvim' "git diffview in neovim
 
 Plug 'vim-airline/vim-airline' "status bar
 Plug 'lukas-reineke/indent-blankline.nvim' "indent indicator
@@ -41,12 +43,17 @@ set updatetime=100
 set hidden                      " Needed to keep multiple buffers open
 set nobackup                    " No auto backups
 set noswapfile                  " No swap
-set number                      " line numbers
+set relativenumber                      " line numbers
 set completeopt=menu,menuone,noselect
-set expandtab
-set softtabstop=4
-set tabstop=4
-set shiftwidth=4
+
+" Spaces & Tabs {{{
+" set tabstop=4       " number of visual spaces per TAB
+" set softtabstop=4   " number of spaces in tab when editing
+" set shiftwidth=4    " number of spaces to use for autoindent
+" set expandtab       " tabs are space
+" set autoindent
+" set copyindent      " copy indent from the previous line
+" }}} Spaces & Tabs
 
 " line swap keybindings
 nnoremap <A-j> :m .+1<CR>==
@@ -65,8 +72,6 @@ noremap <silent> <C-Left> :vertical resize +3<CR>
 noremap <silent> <C-Right> :vertical resize -3<CR>
 noremap <silent> <C-Up> :resize +3<CR>
 noremap <silent> <C-Down> :resize -3<CR>
-
-
 
 "treesitter (syntax hightlight) and color scheme configs 
 lua << EOF
@@ -102,6 +107,7 @@ lua require('nvim_comment').setup()
 " setup telescope
 lua require('telescope').setup()
 noremap <silent> <A-S-f> :Telescope live_grep <CR>
+noremap <silent> <C-S-f> :Telescope current_buffer_fuzzy_find <CR>
 
 " airline (status bar) git branch display
 let g:airline#extensions#branch#enabled = 1
@@ -116,13 +122,12 @@ nnoremap <silent> <F2> <cmd>lua vim.lsp.buf.rename()<CR>
 nnoremap <silent> <C-k> <cmd>lua vim.lsp.buf.signature_hlp()<CR>
 nnoremap <silent> <C-n> <cmd>lua vim.lsp.diagnostic.goto_prev()<CR>
 nnoremap <silent> <C-p> <cmd>lua vim.lsp.diagnostic.goto_next()<CR>
-nnoremap <silent> ca <cmd>lua vim.lsp.buf.code_action()<CR>
+nnoremap <silent> ca <cmd> :CodeActionMenu <CR>
 
 
 " lsp auto installer setup
 lua << EOF
 local lsp_installer = require("nvim-lsp-installer")
-
 lsp_installer.on_server_ready(function(server)
     local opts = {}
 
@@ -136,6 +141,7 @@ lsp_installer.on_server_ready(function(server)
     vim.cmd [[ do User LspAttachBuffers ]]
 end)
 EOF
+
 " coq
 lua << EOF
 local lsp = require "lspconfig"
@@ -150,14 +156,9 @@ lsp.pyright.setup(coq.lsp_ensure_capabilities{})
 vim.cmd('COQnow -s')
 EOF
 
-
-"visuallize git dif
-lua require'diffview'.setup{}
-
-
 "vscode style tabs (bufferline plugin) setup 
-nnoremap <silent> <A-n> :BufferLineCycleNext<CR>
-nnoremap <silent> <A-p> :BufferLineCyclePrev<CR>
+nnoremap <silent> <A-n> :BufferLineCycleNext <CR>
+nnoremap <silent> <A-p> :BufferLineCyclePrev <CR>
 lua << EOF
 require("bufferline").setup{
     options = {
