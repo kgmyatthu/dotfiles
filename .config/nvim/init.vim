@@ -18,8 +18,10 @@ Plug 'rcarriga/nvim-dap-ui' "nvim-dap ui support
 Plug 'terrortylor/nvim-comment' " comment toggler
 
 Plug 'tpope/vim-fugitive' "git commands in neovim
+Plug 'APZelos/blamer.nvim' " git blame
 
 Plug 'vim-airline/vim-airline' "status bar
+
 Plug 'lukas-reineke/indent-blankline.nvim' "indent indicator
 Plug 'kyazdani42/nvim-web-devicons' "colored icons
 Plug 'akinsho/bufferline.nvim' "visual studio code styles tabs
@@ -43,7 +45,7 @@ set updatetime=100
 set hidden                      " Needed to keep multiple buffers open
 set nobackup                    " No auto backups
 set noswapfile                  " No swap
-set relativenumber                      " line numbers
+set number                      " line numbers
 set completeopt=menu,menuone,noselect
 
 " Spaces & Tabs {{{
@@ -74,22 +76,23 @@ noremap <silent> <C-Up> :resize +3<CR>
 noremap <silent> <C-Down> :resize -3<CR>
 
 "treesitter (syntax hightlight) and color scheme configs 
+au BufNewFile,BufRead *.sol setfiletype solidity
 lua << EOF
  require'nvim-treesitter.configs'.setup {
-   ensure_installed = "maintained", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
+   ensure_installed = "all", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
    highlight = {
      enable = true,              -- false will disable the whole extension
-     disable = { "" },  -- list of language that will be disabled
+     disable = {},  -- list of language that will be disabled
    },
-     rainbow = {
-         enable = true,
-         -- disable = { "jsx", "cpp" }, list of languages you want to disable the plugin for
-         extended_mode = true, -- Also highlight non-bracket delimiters like html tags, boolean or table: lang -> boolean
-         max_file_lines = nil, -- Do not enable for files with more than n lines, int
-         -- colors = {}, -- table of hex strings
-         -- termcolors = {} -- table of colour name strings
-       }
- }
+   rainbow = {
+       enable = true,
+       -- disable = { "jsx", "cpp" }, list of languages you want to disable the plugin for
+       extended_mode = true, -- Also highlight non-bracket delimiters like html tags, boolean or table: lang -> boolean
+       max_file_lines = nil, -- Do not enable for files with more than n lines, int
+       -- colors = {}, -- table of hex strings
+       -- termcolors = {} -- table of colour name strings
+     }
+ }  
 EOF
 
 set termguicolors
@@ -99,6 +102,11 @@ highlight PmenuSel guibg=#00FFFF guifg=#000000
 highlight Normal guibg=none
 highlight NonText guibg=none
 
+""""""""""""""""""""
+" git blame
+""""""""""""""""""""
+let g:blamer_enabled = 1
+let g:blamer_relative_time = 1
 
 """""""""""""""""""""
 " setup comment toggler
@@ -133,7 +141,7 @@ lsp_installer.on_server_ready(function(server)
 
     -- (optional) Customize the options passed to the server
     -- if server.name == "tsserver" then
-    --     opts.roo_dir = function() ... end
+    --     opts.root_dir = function() ... end
     -- end
 
     -- This setup() function is exactly the same as lspconfig's setup function (:help lspconfig-quickstart)
@@ -152,7 +160,14 @@ lsp.eslint.setup(coq.lsp_ensure_capabilities{})
 lsp.cssls.setup(coq.lsp_ensure_capabilities{})
 lsp.vimls.setup(coq.lsp_ensure_capabilities{})
 lsp.clangd.setup(coq.lsp_ensure_capabilities{})
+
 lsp.pyright.setup(coq.lsp_ensure_capabilities{})
+lsp.pylsp.setup(coq.lsp_ensure_capabilities{})
+lsp.jedi_language_server.setup(coq.lsp_ensure_capabilities{})
+
+lsp.solc.setup(coq.lsp_ensure_capabilities{})
+lsp.solidity_ls.setup(coq.lsp_ensure_capabilities{})
+lsp.solang.setup(coq.lsp_ensure_capabilities{})
 vim.cmd('COQnow -s')
 EOF
 
