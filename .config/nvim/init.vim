@@ -1,9 +1,6 @@
 call plug#begin('~/.config/nvim/plugins')
 Plug 'nvim-treesitter/nvim-treesitter' "syntax hightlight 
-Plug 'christianchiarulli/nvcode-color-schemes.vim' "color theme
 Plug 'p00f/nvim-ts-rainbow' " bracket colorizer
-Plug 'ap/vim-css-color' "css color helper
-Plug 'pragmaticarun/turbocpp.vim'
 
 " Language server and auto completion plugins
 Plug 'neovim/nvim-lspconfig' " built-in LSP
@@ -12,20 +9,23 @@ Plug 'ms-jpq/coq_nvim', {'branch': 'coq'} "auto completion tool
 Plug 'ms-jpq/coq.artifacts', {'branch': 'artifacts'} " 9000+ snippet
 Plug 'weilbith/nvim-code-action-menu' "codeaction menu
 Plug 'tpope/vim-sleuth' "auto indent space detector
+
 Plug 'mfussenegger/nvim-dap' "debugging support 
 Plug 'rcarriga/nvim-dap-ui' "nvim-dap ui support
+Plug 'theHamsta/nvim-dap-virtual-text'
 
 Plug 'terrortylor/nvim-comment' " comment toggler
 
 Plug 'tpope/vim-fugitive' "git commands in neovim
 Plug 'APZelos/blamer.nvim' " git blame
+Plug 'sindrets/diffview.nvim'
 
 Plug 'vim-airline/vim-airline' "status bar
 
 Plug 'lukas-reineke/indent-blankline.nvim' "indent indicator
 Plug 'kyazdani42/nvim-web-devicons' "colored icons
 Plug 'akinsho/bufferline.nvim' "visual studio code styles tabs
-Plug 'ryanoasis/vim-devicons'
+Plug 'ryanoasis/vim-devicons' "icons
 
 Plug 'kyazdani42/nvim-tree.lua' " file explorer
 
@@ -34,6 +34,10 @@ Plug 'nvim-telescope/telescope.nvim' " fuzzy finder
 Plug 'nvim-telescope/telescope-media-files.nvim' " media preview for telescope
 
 Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']} " markdown preview
+
+Plug 'danilamihailov/beacon.nvim'" cursor tracker
+
+Plug 'vigoux/LanguageTool.nvim' "grammer checker
 call plug#end()
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -47,14 +51,15 @@ set nobackup                    " No auto backups
 set noswapfile                  " No swap
 set number                      " line numbers
 set completeopt=menu,menuone,noselect
+set laststatus=3                " global status bar
 
 " Spaces & Tabs {{{
-" set tabstop=4       " number of visual spaces per TAB
-" set softtabstop=4   " number of spaces in tab when editing
-" set shiftwidth=4    " number of spaces to use for autoindent
-" set expandtab       " tabs are space
-" set autoindent
-" set copyindent      " copy indent from the previous line
+set tabstop=4       " number of visual spaces per TAB
+set softtabstop=4   " number of spaces in tab when editing
+set shiftwidth=4    " number of spaces to use for autoindent
+set expandtab       " tabs are space
+set autoindent
+set copyindent      " copy indent from the previous line
 " }}} Spaces & Tabs
 
 " line swap keybindings
@@ -77,31 +82,29 @@ noremap <silent> <C-Down> :resize -3<CR>
 
 "treesitter (syntax hightlight) and color scheme configs 
 au BufNewFile,BufRead *.sol setfiletype solidity
-lua << EOF
- require'nvim-treesitter.configs'.setup {
-   ensure_installed = "all", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
-   highlight = {
-     enable = true,              -- false will disable the whole extension
-     disable = {},  -- list of language that will be disabled
-   },
-   rainbow = {
-       enable = true,
-       -- disable = { "jsx", "cpp" }, list of languages you want to disable the plugin for
-       extended_mode = true, -- Also highlight non-bracket delimiters like html tags, boolean or table: lang -> boolean
-       max_file_lines = nil, -- Do not enable for files with more than n lines, int
-       -- colors = {}, -- table of hex strings
-       -- termcolors = {} -- table of colour name strings
-     }
- }  
-EOF
-
 set termguicolors
 syntax on
 highlight Pmenu guibg=#0300b3
 highlight PmenuSel guibg=#00FFFF guifg=#000000
 highlight Normal guibg=none
 highlight NonText guibg=none
-
+lua << EOF
+  require'nvim-treesitter.configs'.setup {
+    ensure_installed = "all", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
+    highlight = {
+      enable = true,              -- false will disable the whole extension
+      disable = {},  -- list of language that will be disabled
+    },
+    rainbow = {
+        enable = true,
+        -- disable = { "jsx", "cpp" }, list of languages you want to disable the plugin for
+        extended_mode = true, -- Also highlight non-bracket delimiters like html tags, boolean or table: lang -> boolean
+        max_file_lines = nil, -- Do not enable for files with more than n lines, int
+        -- colors = {}, -- table of hex strings
+        -- termcolors = {} -- table of colour name strings
+      }
+  }  
+EOF
 """"""""""""""""""""
 " git blame
 """"""""""""""""""""
@@ -210,8 +213,6 @@ require'nvim-tree'.setup {
   open_on_setup       = true,
   -- will not open on setup if the filetype is in this list
   ignore_ft_on_setup  = {},
-  -- closes neovim automatically when the tree is the last **WINDOW** in the view
-  auto_close          = false,
   -- opens the tree when changing/opening a new tab if the tree wasn't previously opened
   open_on_tab         = false,
   -- hijacks new directory buffers when they are opened.
@@ -276,3 +277,4 @@ require'nvim-tree'.setup {
 }
 EOF
 
+source ~/.config/nvim/debugger.vim
