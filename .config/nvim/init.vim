@@ -4,7 +4,9 @@ Plug 'p00f/nvim-ts-rainbow' " bracket colorizer
 
 " Language server and auto completion plugins
 Plug 'neovim/nvim-lspconfig' " built-in LSP
-Plug 'williamboman/nvim-lsp-installer' " language server auto installer
+Plug 'williamboman/mason.nvim' "Easily install and manage LSP servers, DAP servers, linters, and formatters.
+Plug 'williamboman/mason-lspconfig.nvim' "LSP installer
+" Plug 'williamboman/nvim-lsp-installer' " language server auto installer
 Plug 'ms-jpq/coq_nvim', {'branch': 'coq'} "auto completion tool
 Plug 'ms-jpq/coq.artifacts', {'branch': 'artifacts'} " 9000+ snippet
 Plug 'weilbith/nvim-code-action-menu' "codeaction menu
@@ -90,16 +92,18 @@ highlight Normal guibg=none
 highlight NonText guibg=none
 lua << EOF
   require'nvim-treesitter.configs'.setup {
-    ensure_installed = "all", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
+    -- ensure_installed = "all", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
     highlight = {
       enable = true,              -- false will disable the whole extension
-      disable = {},  -- list of language that will be disabled
+      disable = function(lang, bufnr) 
+        return vim.api.nvim_buf_line_count(bufnr) > 2000
+      end,
     },
     rainbow = {
         enable = true,
         -- disable = { "jsx", "cpp" }, list of languages you want to disable the plugin for
         extended_mode = true, -- Also highlight non-bracket delimiters like html tags, boolean or table: lang -> boolean
-        max_file_lines = nil, -- Do not enable for files with more than n lines, int
+        max_file_lines = 1000, -- Do not enable for files with more than n lines, int
         -- colors = {}, -- table of hex strings
         -- termcolors = {} -- table of colour name strings
       }
@@ -121,7 +125,7 @@ noremap <silent> <A-S-f> :Telescope live_grep <CR>
 noremap <silent> <C-S-f> :Telescope current_buffer_fuzzy_find <CR>
 
 " airline (status bar) git branch display
-let g:airline#extensions#branch#enabled = 1
+" let g:airline#extensions#branch#enabled = 1
 
 " built in LSP keybindings and auto completion setup
 nnoremap <silent> gd <cmd>lua vim.lsp.buf.definition()<CR>
@@ -136,41 +140,39 @@ nnoremap <silent> <C-p> <cmd>lua vim.lsp.diagnostic.goto_next()<CR>
 nnoremap <silent> ca <cmd> :CodeActionMenu <CR>
 
 
-" lsp auto installer setup
+" coq and mason LSP STUFF
 lua << EOF
-local lsp_installer = require("nvim-lsp-installer")
-lsp_installer.on_server_ready(function(server)
-    local opts = {}
+require("mason").setup()
 
-    -- (optional) Customize the options passed to the server
-    -- if server.name == "tsserver" then
-    --     opts.root_dir = function() ... end
-    -- end
+require("mason-lspconfig").setup({
+    ensure_installed = {
+      'tsserver', 
+      'eslint', 
+      'cssls',
+      'vimls',
+      'clangd',
+      'pyright',
+      'pylsp',
+      'solc',
+      'solidity_ls',
+      'solang'},
+})
 
-    -- This setup() function is exactly the same as lspconfig's setup function (:help lspconfig-quickstart)
-    server:setup(opts)
-    vim.cmd [[ do User LspAttachBuffers ]]
-end)
-EOF
-
-" coq
-lua << EOF
 local lsp = require "lspconfig"
 local coq = require "coq" 
 
-lsp.tsserver.setup(coq.lsp_ensure_capabilities{})
-lsp.eslint.setup(coq.lsp_ensure_capabilities{})
-lsp.cssls.setup(coq.lsp_ensure_capabilities{})
-lsp.vimls.setup(coq.lsp_ensure_capabilities{})
-lsp.clangd.setup(coq.lsp_ensure_capabilities{})
+lsp.tsserver.setup(coq.lsp_ensure_capabilities())
+lsp.eslint.setup(coq.lsp_ensure_capabilities())
+lsp.cssls.setup(coq.lsp_ensure_capabilities())
+lsp.vimls.setup(coq.lsp_ensure_capabilities())
+lsp.clangd.setup(coq.lsp_ensure_capabilities())
 
-lsp.pyright.setup(coq.lsp_ensure_capabilities{})
-lsp.pylsp.setup(coq.lsp_ensure_capabilities{})
-lsp.jedi_language_server.setup(coq.lsp_ensure_capabilities{})
+lsp.pyright.setup(coq.lsp_ensure_capabilities())
+lsp.pylsp.setup(coq.lsp_ensure_capabilities())
 
-lsp.solc.setup(coq.lsp_ensure_capabilities{})
-lsp.solidity_ls.setup(coq.lsp_ensure_capabilities{})
-lsp.solang.setup(coq.lsp_ensure_capabilities{})
+lsp.solc.setup(coq.lsp_ensure_capabilities())
+lsp.solidity_ls.setup(coq.lsp_ensure_capabilities())
+lsp.solang.setup(coq.lsp_ensure_capabilities())
 vim.cmd('COQnow -s')
 EOF
 
