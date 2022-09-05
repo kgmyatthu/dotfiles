@@ -35,7 +35,8 @@ Plug 'nvim-lua/plenary.nvim' " don't know what this it but needed for telescope
 Plug 'nvim-telescope/telescope.nvim' " fuzzy finder
 Plug 'nvim-telescope/telescope-media-files.nvim' " media preview for telescope
 
-Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']} " markdown preview
+Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install' } "markdown-preview
+Plug 'ellisonleao/glow.nvim' " markdown preview
 
 Plug 'danilamihailov/beacon.nvim'" cursor tracker
 
@@ -122,7 +123,7 @@ lua require('nvim_comment').setup()
 " setup telescope
 lua require('telescope').setup()
 noremap <silent> <A-S-f> :Telescope live_grep <CR>
-noremap <silent> <C-S-f> :Telescope current_buffer_fuzzy_find <CR>
+" noremap <silent> ff :Telescope current_buffer_fuzzy_find <CR>
 
 " airline (status bar) git branch display
 " let g:airline#extensions#branch#enabled = 1
@@ -185,7 +186,6 @@ require("bufferline").setup{
           numbers = function(opts)
             return string.format('%s.%s', opts.id, opts.raise(opts.ordinal))
           end,
-        indicator_icon = ' >',
         show_buffer_close_icons = false,
         show_close_icon = false,
         tabsize = 25,
@@ -218,12 +218,6 @@ require'nvim-tree'.setup {
   -- opens the tree when changing/opening a new tab if the tree wasn't previously opened
   open_on_tab         = false,
   -- hijacks new directory buffers when they are opened.
-  update_to_buf_dir   = {
-    -- enable the feature
-    enable = true,
-    -- allow to open the tree if it was previously closed
-    auto_open = true,
-  },
   -- hijack the cursor in the tree to put it at the start of the filename
   hijack_cursor       = false,
   -- updates the root directory of the tree on `DirChanged` (when you run `:cd` usually)
@@ -266,8 +260,6 @@ require'nvim-tree'.setup {
     hide_root_folder = false,
     -- side of the tree, can be one of 'left' | 'right' | 'top' | 'bottom'
     side = 'left',
-    -- if true the tree will resize itself after opening a file
-    auto_resize = false,
     mappings = {
       -- custom only false will merge the list with the default mappings
       -- if true, it will only use your list to set the mappings
