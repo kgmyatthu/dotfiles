@@ -46,6 +46,7 @@ call plug#end()
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => General Settings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+set mouse=nicr "mouse scrolling
 set clipboard+=unnamedplus
 set path+=**                                    " Searches current directory recursively.
 set updatetime=100
@@ -55,6 +56,7 @@ set noswapfile                  " No swap
 set number                      " line numbers
 set completeopt=menu,menuone,noselect
 set laststatus=3                " global status bar
+let mapleader=";"
 
 " Spaces & Tabs {{{
 set tabstop=4       " number of visual spaces per TAB
@@ -73,15 +75,18 @@ inoremap <A-k> <Esc>:m .-2<CR>==gi
 vnoremap <A-k> :m '<-2<CR>gv=gv 
 vnoremap <A-j> :m '>+1<CR>gv=gv
 
+" escape
+inoremap ;; <Esc>
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Splits and Tabbed Files
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set splitbelow
 " Make adjusing split sizes a bit more friendly
-noremap <silent> <C-Left> :vertical resize +3<CR>
-noremap <silent> <C-Right> :vertical resize -3<CR>
-noremap <silent> <C-Up> :resize +3<CR>
-noremap <silent> <C-Down> :resize -3<CR>
+noremap <silent> <C-a> :vertical resize +3<CR>
+noremap <silent> <C-d> :vertical resize -3<CR>
+" noremap <silent> <C-w> :resize +3<CR>
+" noremap <silent> <C-s> :resize -3<CR>
 
 "treesitter (syntax hightlight) and color scheme configs 
 au BufNewFile,BufRead *.sol setfiletype solidity
@@ -122,7 +127,7 @@ lua require('nvim_comment').setup()
 
 " setup telescope
 lua require('telescope').setup()
-noremap <silent> <A-S-f> :Telescope live_grep <CR>
+noremap <silent> <leader>li :Telescope live_grep <CR>
 " noremap <silent> ff :Telescope current_buffer_fuzzy_find <CR>
 
 " airline (status bar) git branch display
