@@ -77,13 +77,13 @@
 # ############################################################### #
 
 # focus window
-alt - h : yabai -m window --focus west || yabai -m display --focus next || yabai -m display --focus prev
+alt - h : yabai -m window --focus west || yabai -m display --focus last 
 alt - j : yabai -m window --focus south 
 alt - k : yabai -m window --focus north
-alt - l : yabai -m window --focus east || yabai -m display --focus next || yabai -m display --focus prev
+alt - l : yabai -m window --focus east || yabai -m display --focus first 
 
-# switch layout
-alt - space: (yabai -m query --spaces | grep "stack" && yabai -m config layout bsp) || (yabai -m query --spaces | grep "bsp" && yabai -m config layout stack)
+# switch layout (cycling between bsp and stack)
+alt - space: (yabai -m query --spaces --space | grep "stack" && yabai -m config --space $(yabai -m query --windows --window | jq '.space') layout bsp) || (yabai -m query --spaces --space | grep "bsp" && yabai -m config  --space $(yabai -m query --windows --window | jq '.space') layout stack)
 
 # swap managed window
 # shift + alt - h : yabai -m window --swap north
