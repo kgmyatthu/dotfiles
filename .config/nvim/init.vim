@@ -1,7 +1,13 @@
 call plug#begin('~/.config/nvim/plugins')
+Plug 'github/copilot.vim' "ai pair code
+
 Plug 'nvim-treesitter/nvim-treesitter' "syntax hightlight 
 Plug 'p00f/nvim-ts-rainbow' " bracket colorizer
+Plug 'shaeinst/roshnivim-cs' "color theme
+Plug 'ray-x/starry.nvim'      " color theme
+Plug 'NvChad/nvim-colorizer.lua' "color preview
 
+Plug 'sunjon/shade.nvim' "inactive window dimmer
 " Language server and auto completion plugins
 Plug 'neovim/nvim-lspconfig' " built-in LSP
 Plug 'williamboman/mason.nvim' "Easily install and manage LSP servers, DAP servers, linters, and formatters.
@@ -11,6 +17,8 @@ Plug 'ms-jpq/coq_nvim', {'branch': 'coq'} "auto completion tool
 Plug 'ms-jpq/coq.artifacts', {'branch': 'artifacts'} " 9000+ snippet
 Plug 'weilbith/nvim-code-action-menu' "codeaction menu
 Plug 'tpope/vim-sleuth' "auto indent space detector
+Plug 'liuchengxu/vista.vim' "code structure outline shower
+Plug 'echasnovski/mini.nvim' "mini map
 
 Plug 'mfussenegger/nvim-dap' "debugging support 
 Plug 'rcarriga/nvim-dap-ui' "nvim-dap ui support
@@ -26,6 +34,7 @@ Plug 'vim-airline/vim-airline' "status bar
 
 Plug 'lukas-reineke/indent-blankline.nvim' "indent indicator
 Plug 'kyazdani42/nvim-web-devicons' "colored icons
+
 Plug 'akinsho/bufferline.nvim' "visual studio code styles tabs
 Plug 'ryanoasis/vim-devicons' "icons
 
@@ -40,13 +49,16 @@ Plug 'ellisonleao/glow.nvim' " markdown preview
 
 Plug 'danilamihailov/beacon.nvim'" cursor tracker
 
-Plug 'vigoux/LanguageTool.nvim' "grammer checker
+" active window expander
+Plug 'anuvyklack/windows.nvim' 
+Plug 'anuvyklack/middleclass'
+Plug 'anuvyklack/animation.nvim'
 call plug#end()
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => General Settings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set mouse=nicr "mouse scrolling
+set mouse= "disable mouse
 set clipboard+=unnamedplus
 set path+=**                                    " Searches current directory recursively.
 set updatetime=100
@@ -54,10 +66,13 @@ set hidden                      " Needed to keep multiple buffers open
 set nobackup                    " No auto backups
 set noswapfile                  " No swap
 set number                      " line numbers
+set relativenumber
 set completeopt=menu,menuone,noselect
 set laststatus=3                " global status bar
 let mapleader=";"
 
+set foldmethod=expr
+set foldexpr=nvim_treesitter#foldexpr()
 " Spaces & Tabs {{{
 set tabstop=4       " number of visual spaces per TAB
 set softtabstop=4   " number of spaces in tab when editing
@@ -76,7 +91,7 @@ vnoremap <A-k> :m '<-2<CR>gv=gv
 vnoremap <A-j> :m '>+1<CR>gv=gv
 
 " escape
-inoremap ;; <Esc>
+" inoremap ;; <Esc>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Splits and Tabbed Files
@@ -90,13 +105,39 @@ noremap <silent> <C-d> :vertical resize -3<CR>
 
 "treesitter (syntax hightlight) and color scheme configs 
 au BufNewFile,BufRead *.sol setfiletype solidity
-set termguicolors
-syntax on
-highlight Pmenu guibg=#0300b3
-highlight PmenuSel guibg=#00FFFF guifg=#000000
-highlight Normal guibg=none
-highlight NonText guibg=none
 lua << EOF
+  require'windows'.setup({
+    autowidth = {			--		       |windows.autowidth|
+        winwidth = 1.4,			--		        |windows.winwidth|
+       },
+  })
+    require'colorizer'.setup()
+  -- require('shade').setup()
+  -- mminimap for code
+  local MiniMap = require('mini.map')
+  require('mini.map').setup({
+      -- Highlight integrations (none by default)
+      integrations = {
+        MiniMap.gen_integration.builtin_search(),
+        MiniMap.gen_integration.gitsigns(),
+      },
+
+      -- Symbols used to display data
+      symbols = {
+        -- Encode symbols. See `:h MiniMap.config` for specification and
+        -- `:h MiniMap.gen_encode_symbols` for pre-built ones.
+        -- Default: solid blocks with 3x2 resolution.
+        encode = MiniMap.gen_encode_symbols.shade('2x1'),
+
+        -- Scrollbar parts for view and line. Use empty string to disable any.
+        scroll_line = '█',
+        scroll_view = '┃',
+      },
+  })
+  vim.keymap.set('n', '<Leader>ma', function()
+    MiniMap.toggle()
+  end)
+
   require'nvim-treesitter.configs'.setup {
     -- ensure_installed = "all", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
     highlight = {
@@ -115,6 +156,14 @@ lua << EOF
       }
   }  
 EOF
+
+set termguicolors 
+syntax on
+colorscheme darkblue
+" highlight Pmenu guibg=#0300b3 guifg=#00FFFF
+" highlight PmenuSel guibg=#00FFFF guifg=#000000
+" highlight Normal guibg=none
+" highlight NonText guibg=none
 """"""""""""""""""""
 " git blame
 """"""""""""""""""""
@@ -141,10 +190,16 @@ nnoremap <silent> gi <cmd>lua vim.lsp.buf.implementation()<CR>
 nnoremap <silent> K <cmd>lua vim.lsp.buf.hover()<CR>
 nnoremap <silent> <F2> <cmd>lua vim.lsp.buf.rename()<CR>
 nnoremap <silent> <C-k> <cmd>lua vim.lsp.buf.signature_hlp()<CR>
-nnoremap <silent> <C-n> <cmd>lua vim.lsp.diagnostic.goto_prev()<CR>
-nnoremap <silent> <C-p> <cmd>lua vim.lsp.diagnostic.goto_next()<CR>
+nnoremap <silent> <C-n> <cmd>lua vim.diagnostic.goto_next()<CR>
+nnoremap <silent> <C-p> <cmd>lua vim.diagnostic.goto_prev()<CR>
 nnoremap <silent> ca <cmd> :CodeActionMenu <CR>
 
+lua << EOF
+vim.fn.sign_define("DiagnosticSignError", { text = "", texthl = "DiagnosticSignError" })
+vim.fn.sign_define("DiagnosticSignWarn", { text = "", texthl = "DiagnosticSignWarn" })
+vim.fn.sign_define("DiagnosticSignInformation", { text = "", texthl = "DiagnosticSignInfo" })
+vim.fn.sign_define("DiagnosticSignHint", { text = "", texthl = "DiagnosticSignHint" })
+EOF
 
 " coq and mason LSP STUFF
 lua << EOF
@@ -159,9 +214,7 @@ require("mason-lspconfig").setup({
       'clangd',
       'pyright',
       'pylsp',
-      'solc',
-      'solidity_ls',
-      'solang'},
+    }
 })
 
 local lsp = require "lspconfig"
@@ -175,10 +228,8 @@ lsp.clangd.setup(coq.lsp_ensure_capabilities())
 
 lsp.pyright.setup(coq.lsp_ensure_capabilities())
 lsp.pylsp.setup(coq.lsp_ensure_capabilities())
-
-lsp.solc.setup(coq.lsp_ensure_capabilities())
-lsp.solidity_ls.setup(coq.lsp_ensure_capabilities())
-lsp.solang.setup(coq.lsp_ensure_capabilities())
+lsp.vuels.setup(coq.lsp_ensure_capabilities())
+lsp.volar.setup(coq.lsp_ensure_capabilities())
 vim.cmd('COQnow -s')
 EOF
 
@@ -275,5 +326,5 @@ require'nvim-tree'.setup {
   }
 }
 EOF
-
 source ~/.config/nvim/debugger.vim
+source ~/.config/nvim/vistaConfig.vim

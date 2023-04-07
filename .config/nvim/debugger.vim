@@ -76,7 +76,7 @@ dap.configurations.typescript = {
         cwd = vim.fn.getcwd(),
         sourceMaps = true,
         protocol = "inspector",
-        port = 9222,
+        port = 9229,
         webRoot = "${workspaceFolder}"
     }
 }
