@@ -92,7 +92,7 @@ alt - space: (yabai -m query --spaces --space | grep "stack" && yabai -m config 
 # shift + cmd - h : yabai -m window --warp east
 
 # balance size of windows
-# shift + alt - 0 : yabai -m space --balance
+shift + alt - 0 : yabai -m space --balance
 
 # make floating window fill screen
 # shift + alt - up     : yabai -m window --grid 1:1:0:0:1:1
@@ -105,9 +105,14 @@ alt - space: (yabai -m query --spaces --space | grep "stack" && yabai -m config 
 #                   index="$(yabai -m query --spaces --display | jq 'map(select(."is-native-fullscreen" == false))[-1].index')" && \
 #                   yabai -m window --space "${index}" && \
 #                   yabai -m space --focus "${index}"
-
+alt - 1: yabai -m window --space 1 && \
+         yabai -m space --focus 1
+alt - 2: yabai -m window --space 2 && \
+         yabai -m space --focus 2 
+alt - 3: yabai -m window --space 3 && \
+         yabai -m space --focus 3
 # fast focus desktop
-# cmd + alt - x : yabai -m space --focus recent
+shift + alt - 2 : yabai -m space --focus 2 #(cycle) 
 # cmd + alt - 1 : yabai -m space --focus 1
 
 # send window to desktop and follow focus
