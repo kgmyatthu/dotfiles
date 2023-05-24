@@ -1,11 +1,14 @@
 call plug#begin('~/.config/nvim/plugins')
-Plug 'github/copilot.vim' "ai pair code
+" Plug 'github/copilot.vim' "ai pair code
+Plug 'zbirenbaum/copilot.lua'
 
 Plug 'nvim-treesitter/nvim-treesitter' "syntax hightlight 
 Plug 'p00f/nvim-ts-rainbow' " bracket colorizer
 Plug 'shaeinst/roshnivim-cs' "color theme
 Plug 'ray-x/starry.nvim'      " color theme
 Plug 'NvChad/nvim-colorizer.lua' "color preview
+Plug 'bluz71/vim-nightfly-colors', { 'as': 'nightfly' } "theme
+Plug 'Abstract-IDE/Abstract-cs'
 
 Plug 'sunjon/shade.nvim' "inactive window dimmer
 " Language server and auto completion plugins
@@ -13,8 +16,14 @@ Plug 'neovim/nvim-lspconfig' " built-in LSP
 Plug 'williamboman/mason.nvim' "Easily install and manage LSP servers, DAP servers, linters, and formatters.
 Plug 'williamboman/mason-lspconfig.nvim' "LSP installer
 " Plug 'williamboman/nvim-lsp-installer' " language server auto installer
-Plug 'ms-jpq/coq_nvim', {'branch': 'coq'} "auto completion tool
-Plug 'ms-jpq/coq.artifacts', {'branch': 'artifacts'} " 9000+ snippet
+Plug 'hrsh7th/cmp-nvim-lsp' "auto completion suite
+Plug 'hrsh7th/cmp-buffer'
+Plug 'hrsh7th/cmp-path'
+Plug 'hrsh7th/cmp-cmdline'
+Plug 'hrsh7th/nvim-cmp'
+Plug 'onsails/lspkind-nvim' "auto completion icons
+" Plug 'ms-jpq/coq_nvim', {'branch': 'coq'} "auto completion tool
+" Plug 'ms-jpq/coq.artifacts', {'branch': 'artifacts'} " 9000+ snippet
 Plug 'weilbith/nvim-code-action-menu' "codeaction menu
 Plug 'tpope/vim-sleuth' "auto indent space detector
 Plug 'liuchengxu/vista.vim' "code structure outline shower
@@ -143,7 +152,7 @@ lua << EOF
     highlight = {
       enable = true,              -- false will disable the whole extension
       disable = function(lang, bufnr) 
-        return vim.api.nvim_buf_line_count(bufnr) > 2000
+        return vim.api.nvim_buf_line_count(bufnr) > 1000
       end,
     },
     rainbow = {
@@ -203,6 +212,33 @@ EOF
 
 " coq and mason LSP STUFF
 lua << EOF
+local cmp_kinds = {
+  Text = '  ',
+  Method = '  ',
+  Function = '  ',
+  Constructor = '  ',
+  Field = '  ',
+  Variable = '  ',
+  Class = '  ',
+  Interface = '  ',
+  Module = '  ',
+  Property = '  ',
+  Unit = '  ',
+  Value = '  ',
+  Enum = '  ',
+  Keyword = '  ',
+  Snippet = '  ',
+  Color = '  ',
+  File = '  ',
+  Reference = '  ',
+  Folder = '  ',
+  EnumMember = '  ',
+  Constant = '  ',
+  Struct = '  ',
+  Event = '  ',
+  Operator = '  ',
+  TypeParameter = '  ',
+}
 require("mason").setup()
 
 require("mason-lspconfig").setup({
@@ -214,23 +250,130 @@ require("mason-lspconfig").setup({
       'clangd',
       'pyright',
       'pylsp',
+      'csharp_ls',
+      'omnisharp_mono',
+      'rust_analyzer'
     }
 })
 
-local lsp = require "lspconfig"
-local coq = require "coq" 
+  -- Set up nvim-cmp.
+  local cmp = require'cmp'
 
-lsp.tsserver.setup(coq.lsp_ensure_capabilities())
-lsp.eslint.setup(coq.lsp_ensure_capabilities())
-lsp.cssls.setup(coq.lsp_ensure_capabilities())
-lsp.vimls.setup(coq.lsp_ensure_capabilities())
-lsp.clangd.setup(coq.lsp_ensure_capabilities())
+  cmp.setup({
+      formatting = {
+        format = function(entry, vim_item)
+            -- From kind_icons array
+            vim_item.kind = string.format('%s %s', cmp_kinds[vim_item.kind], vim_item.kind) -- This concatonates the icons with the name of the item kind
+            -- Source
+            vim_item.menu = ({
+              buffer = "[Buffer]",
+              nvim_lsp = "[LSP]",
+              luasnip = "[LuaSnip]",
+              nvim_lua = "[Lua]",
+                  latex_symbols = "[LaTeX]",
+                })[entry.source.name]
+            return vim_item
+        end
+    },
+    snippet = {
+      -- REQUIRED - you must specify a snippet engine
+      expand = function(args)
+        vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
+        -- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+        -- require('snippy').expand_snippet(args.body) -- For `snippy` users.
+        -- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
+      end,
+    },
+    
+    window = {
+        completion = {
+            border = "rounded",
+            winhighlight = "Normal:Pmenu,FloatBorder:None,CursorLine:Visual,Search:None",
+        },
+        documentation = {
+            border = "rounded",
+            winhighlight = "Normal:Pmenu,FloatBorder:Normal,CursorLine:Visual,Search:None",
+        },
+    },
+    mapping = cmp.mapping.preset.insert({
+      ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+      ['<C-f>'] = cmp.mapping.scroll_docs(4),
+      ['<C-]>'] = cmp.mapping.complete(),
+      ['<C-e>'] = cmp.mapping.abort(),
+      ['<CR>'] = cmp.mapping.confirm({ select = false }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+    }),
+    sources = cmp.config.sources({
+      { name = 'nvim_lsp' },
+      { name = 'vsnip' }, -- For vsnip users.
+      -- { name = 'luasnip' }, -- For luasnip users.
+      -- { name = 'ultisnips' }, -- For ultisnips users.
+      -- { name = 'snippy' }, -- For snippy users.
+    }, {
+      { name = 'buffer' },
+    })
+  })
 
-lsp.pyright.setup(coq.lsp_ensure_capabilities())
-lsp.pylsp.setup(coq.lsp_ensure_capabilities())
-lsp.vuels.setup(coq.lsp_ensure_capabilities())
-lsp.volar.setup(coq.lsp_ensure_capabilities())
-vim.cmd('COQnow -s')
+  -- Set configuration for specific filetype.
+  cmp.setup.filetype('gitcommit', {
+    sources = cmp.config.sources({
+      { name = 'cmp_git' }, -- You can specify the `cmp_git` source if you were installed it.
+    }, {
+      { name = 'buffer' },
+    })
+  })
+
+  -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
+  cmp.setup.cmdline({ '/', '?' }, {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = {
+      { name = 'buffer' }
+    }
+  })
+
+  -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+  cmp.setup.cmdline(':', {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = cmp.config.sources({
+      { name = 'path' }
+    }, {
+      { name = 'cmdline' }
+    })
+  })
+
+  -- Set up lspconfig.
+  local capabilities = require('cmp_nvim_lsp').default_capabilities()
+  -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
+  require('lspconfig')['tsserver'].setup {
+    capabilities = capabilities
+  }
+  require('lspconfig')['eslint'].setup {
+    capabilities = capabilities
+  }
+  require('lspconfig')['ccls'].setup {
+    capabilities = capabilities
+  }
+  require('lspconfig')['clangd'].setup {
+    capabilities = capabilities
+  }
+  require('lspconfig')['pyright'].setup {
+    capabilities = capabilities
+  }
+  require('lspconfig')['rust_analyzer'].setup {
+    capabilities = capabilities
+  }
+  require('lspconfig')['omnisharp'].setup {
+    capabilities = capabilities,
+    cmd = { "omnisharp-mono", '--languageserver' , '--hostPID', tostring(vim.fn.getpid()) },
+  }
+
+--      'tsserver', 
+--      'eslint', 
+--      'cssls',
+--      'vimls',
+--      'clangd',
+--      'pyright',
+--      'pylsp',
+--      'omnisharp_mono',
 EOF
 
 "vscode style tabs (bufferline plugin) setup 
@@ -328,3 +471,5 @@ require'nvim-tree'.setup {
 EOF
 source ~/.config/nvim/debugger.vim
 source ~/.config/nvim/vistaConfig.vim
+source ~/.config/nvim/copilot.vim
+
