@@ -1,73 +1,77 @@
-call plug#begin('~/.config/nvim/plugins')
-" Plug 'github/copilot.vim' "ai pair code
-Plug 'zbirenbaum/copilot.lua'
+lua << EOF
+vim.g.mapleader = ";"
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+  vim.fn.system({
+    "git",
+    "clone",
+    "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable", -- latest stable release
+    lazypath,
+  })
+end
+vim.opt.rtp:prepend(lazypath)
+require("lazy").setup({
+ "zbirenbaum/copilot.lua" , -- github copilot
+ "nvim-treesitter/nvim-treesitter" , --syntax hightlight 
+ "p00f/nvim-ts-rainbow" , -- bracket colorizer
+ "NvChad/nvim-colorizer.lua" , --color preview
+ "Abstract-IDE/Abstract-cs" , -- color theme
+ "fenetikm/falcon" , -- colorscheme
+ "dasupradyumna/midnight.nvim" , --colorscheme
+ "tiagovla/tokyodark.nvim" , --colorscheme
+ "RRethy/nvim-base16" , -- colorscheme
+ "rktjmp/lush.nvim" , --arctic"s dep
+ "rockyzhang24/arctic.nvim" , -- colorscheme
+ "sunjon/shade.nvim" , --inactive window dimmer
+ -- Language server and auto completion plugins
+ "neovim/nvim-lspconfig" , -- built-in LSP
+ "williamboman/mason.nvim" , --Easily install and manage LSP servers, DAP servers, linters, and formatters.
+ "williamboman/mason-lspconfig.nvim" , --LSP installer
+--  "williamboman/nvim-lsp-installer" , -- language server auto installer
+ "hrsh7th/cmp-nvim-lsp" , --auto completion suite
+ "hrsh7th/cmp-buffer",
+ "hrsh7th/cmp-path",
+ "hrsh7th/cmp-cmdline",
+ "hrsh7th/nvim-cmp",
+ "onsails/lspkind-nvim" , --auto completion icons
+ "rcarriga/nvim-notify" , -- notification
+ --  "ms-jpq/coq_nvim", {"branch": "coq"} , --auto completion tool
+ --  "ms-jpq/coq.artifacts", {"branch": "artifacts"} , -- 9000+ snippet
+ "weilbith/nvim-code-action-menu" , --codeaction menu
+ "tpope/vim-sleuth" , --auto indent space detector
+ "mfussenegger/nvim-dap" , --debugging support 
+ "rcarriga/nvim-dap-ui" , --nvim-dap ui support
+ "theHamsta/nvim-dap-virtual-text",
+ "terrortylor/nvim-comment" , -- comment toggler
+ "tpope/vim-fugitive" , --git commands in neovim
+ "APZelos/blamer.nvim" , -- git blame
+ "vim-airline/vim-airline" , --status bar
+ "lukas-reineke/indent-blankline.nvim" , --indent indicator
+ "kyazdani42/nvim-web-devicons" , --colored icons
+ "akinsho/bufferline.nvim" , --visual studio code styles tabs
+ "ryanoasis/vim-devicons" , --icons
+ "kyazdani42/nvim-tree.lua" , -- file explorer
 
-Plug 'nvim-treesitter/nvim-treesitter' "syntax hightlight 
-Plug 'p00f/nvim-ts-rainbow' " bracket colorizer
-Plug 'shaeinst/roshnivim-cs' "color theme
-Plug 'ray-x/starry.nvim'      " color theme
-Plug 'NvChad/nvim-colorizer.lua' "color preview
-Plug 'bluz71/vim-nightfly-colors', { 'as': 'nightfly' } "theme
-Plug 'Abstract-IDE/Abstract-cs'
+ "nvim-lua/plenary.nvim" , -- don"t know what this it but needed for telescope
+ "nvim-telescope/telescope.nvim" , -- fuzzy finder
+ "nvim-telescope/telescope-media-files.nvim" , -- media preview for telescope
+ "danilamihailov/beacon.nvim", -- cursor tracker
+ -- active window expander
+ "anuvyklack/windows.nvim" ,
+ "anuvyklack/middleclass",
+ "anuvyklack/animation.nvim",
 
-Plug 'sunjon/shade.nvim' "inactive window dimmer
-" Language server and auto completion plugins
-Plug 'neovim/nvim-lspconfig' " built-in LSP
-Plug 'williamboman/mason.nvim' "Easily install and manage LSP servers, DAP servers, linters, and formatters.
-Plug 'williamboman/mason-lspconfig.nvim' "LSP installer
-" Plug 'williamboman/nvim-lsp-installer' " language server auto installer
-Plug 'hrsh7th/cmp-nvim-lsp' "auto completion suite
-Plug 'hrsh7th/cmp-buffer'
-Plug 'hrsh7th/cmp-path'
-Plug 'hrsh7th/cmp-cmdline'
-Plug 'hrsh7th/nvim-cmp'
-Plug 'onsails/lspkind-nvim' "auto completion icons
-" Plug 'ms-jpq/coq_nvim', {'branch': 'coq'} "auto completion tool
-" Plug 'ms-jpq/coq.artifacts', {'branch': 'artifacts'} " 9000+ snippet
-Plug 'weilbith/nvim-code-action-menu' "codeaction menu
-Plug 'tpope/vim-sleuth' "auto indent space detector
-Plug 'liuchengxu/vista.vim' "code structure outline shower
-Plug 'echasnovski/mini.nvim' "mini map
+ "folke/which-key.nvim",-- show keybindings
+})
 
-Plug 'mfussenegger/nvim-dap' "debugging support 
-Plug 'rcarriga/nvim-dap-ui' "nvim-dap ui support
-Plug 'theHamsta/nvim-dap-virtual-text'
-
-Plug 'terrortylor/nvim-comment' " comment toggler
-
-Plug 'tpope/vim-fugitive' "git commands in neovim
-Plug 'APZelos/blamer.nvim' " git blame
-Plug 'sindrets/diffview.nvim'
-
-Plug 'vim-airline/vim-airline' "status bar
-
-Plug 'lukas-reineke/indent-blankline.nvim' "indent indicator
-Plug 'kyazdani42/nvim-web-devicons' "colored icons
-
-Plug 'akinsho/bufferline.nvim' "visual studio code styles tabs
-Plug 'ryanoasis/vim-devicons' "icons
-
-Plug 'kyazdani42/nvim-tree.lua' " file explorer
-
-Plug 'nvim-lua/plenary.nvim' " don't know what this it but needed for telescope
-Plug 'nvim-telescope/telescope.nvim' " fuzzy finder
-Plug 'nvim-telescope/telescope-media-files.nvim' " media preview for telescope
-
-Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install' } "markdown-preview
-Plug 'ellisonleao/glow.nvim' " markdown preview
-
-Plug 'danilamihailov/beacon.nvim'" cursor tracker
-
-" active window expander
-Plug 'anuvyklack/windows.nvim' 
-Plug 'anuvyklack/middleclass'
-Plug 'anuvyklack/animation.nvim'
-call plug#end()
+EOF
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => General Settings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set mouse= "disable mouse
+set mouse=n "disable mouse
 set clipboard+=unnamedplus
 set path+=**                                    " Searches current directory recursively.
 set updatetime=100
@@ -80,8 +84,10 @@ set completeopt=menu,menuone,noselect
 set laststatus=3                " global status bar
 let mapleader=";"
 
+
 set foldmethod=expr
 set foldexpr=nvim_treesitter#foldexpr()
+
 " Spaces & Tabs {{{
 set tabstop=4       " number of visual spaces per TAB
 set softtabstop=4   " number of spaces in tab when editing
@@ -100,7 +106,7 @@ vnoremap <A-k> :m '<-2<CR>gv=gv
 vnoremap <A-j> :m '>+1<CR>gv=gv
 
 " escape
-" inoremap ;; <Esc>
+inoremap <C-c> <Esc>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Splits and Tabbed Files
@@ -114,38 +120,23 @@ noremap <silent> <C-d> :vertical resize -3<CR>
 
 "treesitter (syntax hightlight) and color scheme configs 
 au BufNewFile,BufRead *.sol setfiletype solidity
+
 lua << EOF
+    vim.notify = require("notify")
+    vim.notify.setup(
+      {
+        fps = 20,
+        render = "default",
+        stages = "slide",
+        timeout = 3000,
+      }
+    );
   require'windows'.setup({
     autowidth = {			--		       |windows.autowidth|
         winwidth = 1.4,			--		        |windows.winwidth|
        },
   })
     require'colorizer'.setup()
-  -- require('shade').setup()
-  -- mminimap for code
-  local MiniMap = require('mini.map')
-  require('mini.map').setup({
-      -- Highlight integrations (none by default)
-      integrations = {
-        MiniMap.gen_integration.builtin_search(),
-        MiniMap.gen_integration.gitsigns(),
-      },
-
-      -- Symbols used to display data
-      symbols = {
-        -- Encode symbols. See `:h MiniMap.config` for specification and
-        -- `:h MiniMap.gen_encode_symbols` for pre-built ones.
-        -- Default: solid blocks with 3x2 resolution.
-        encode = MiniMap.gen_encode_symbols.shade('2x1'),
-
-        -- Scrollbar parts for view and line. Use empty string to disable any.
-        scroll_line = '█',
-        scroll_view = '┃',
-      },
-  })
-  vim.keymap.set('n', '<Leader>ma', function()
-    MiniMap.toggle()
-  end)
 
   require'nvim-treesitter.configs'.setup {
     -- ensure_installed = "all", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
@@ -164,13 +155,22 @@ lua << EOF
         -- termcolors = {} -- table of colour name strings
       }
   }  
+
+  require("indent_blankline").setup {
+      -- for example, context is off by default, use this to turn it on
+      show_current_context = true,
+      show_current_context_start = true,
+  }
+
 EOF
 
 set termguicolors 
 syntax on
 colorscheme darkblue
-" highlight Pmenu guibg=#0300b3 guifg=#00FFFF
-" highlight PmenuSel guibg=#00FFFF guifg=#000000
+highlight Pmenu guibg=#0300b3 guifg=#00FFFF
+highlight PmenuSel guibg=#00FFFF guifg=#000000
+highlight LineNr guibg=none guifg=#ffffff
+highlight WinSeparator guifg=#ffffff
 " highlight Normal guibg=none
 " highlight NonText guibg=none
 """"""""""""""""""""
@@ -349,9 +349,6 @@ require("mason-lspconfig").setup({
   require('lspconfig')['eslint'].setup {
     capabilities = capabilities
   }
-  require('lspconfig')['ccls'].setup {
-    capabilities = capabilities
-  }
   require('lspconfig')['clangd'].setup {
     capabilities = capabilities
   }
@@ -359,6 +356,12 @@ require("mason-lspconfig").setup({
     capabilities = capabilities
   }
   require('lspconfig')['rust_analyzer'].setup {
+    capabilities = capabilities
+  }
+  require('lspconfig')['bashls'].setup {
+    capabilities = capabilities
+  }
+  require('lspconfig')['jdtls'].setup {
     capabilities = capabilities
   }
   require('lspconfig')['omnisharp'].setup {
@@ -410,10 +413,6 @@ require'nvim-tree'.setup {
   disable_netrw       = true,
   -- hijack netrw window on startup
   hijack_netrw        = true,
-  -- open the tree when running this setup function
-  open_on_setup       = true,
-  -- will not open on setup if the filetype is in this list
-  ignore_ft_on_setup  = {},
   -- opens the tree when changing/opening a new tab if the tree wasn't previously opened
   open_on_tab         = false,
   -- hijacks new directory buffers when they are opened.
@@ -453,8 +452,6 @@ require'nvim-tree'.setup {
   view = {
     -- width of the window, can be either a number (columns) or a string in `%`, for left or right side placement
     width = 30,
-    -- height of the window, can be either a number (columns) or a string in `%`, for top or bottom side placement
-    height = 30,
     -- Hide the root path of the current folder on top of the tree 
     hide_root_folder = false,
     -- side of the tree, can be one of 'left' | 'right' | 'top' | 'bottom'
@@ -470,6 +467,5 @@ require'nvim-tree'.setup {
 }
 EOF
 source ~/.config/nvim/debugger.vim
-source ~/.config/nvim/vistaConfig.vim
 source ~/.config/nvim/copilot.vim
 
