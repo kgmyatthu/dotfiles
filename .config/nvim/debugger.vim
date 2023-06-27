@@ -1,6 +1,6 @@
 lua << EOF
-vim.keymap.set("n", "<F5>", ":lua require'dap'.continue()<CR>")
-vim.keymap.set("n", "<F3>", ":lua require'dap'.step_over()<CR>")
+vim.keymap.set("n", "<leader>dg", ":lua require'dap'.continue()<CR>")
+vim.keymap.set("n", "<F5>", ":lua require'dap'.step_over()<CR>")
 vim.keymap.set("n", "<F4>", ":lua require'dap'.step_into()<CR>")
 vim.keymap.set("n", "<F12>", ":lua require'dap'.step_out()<CR>")
 vim.keymap.set("n", "<leader>b", ":lua require'dap'.toggle_breakpoint()<CR>")
@@ -82,6 +82,7 @@ dap.configurations.typescript = {
 }
 
 
+ -- don't forget to compile with debug symbols
  dap.adapters.codelldb = function(on_adapter)
    -- This asks the system for a free port
    local tcp = vim.loop.new_tcp()
