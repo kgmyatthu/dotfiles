@@ -16,8 +16,10 @@ require("lazy").setup({
 
 { 'echasnovski/mini.files', version = false }, --file explorer
 { 'echasnovski/mini.indentscope', version = '*' }, --scop visualier
- "zbirenbaum/copilot.lua" , -- github copilot
+ --"zbirenbaum/copilot.lua" , -- github copilot
+ "github/copilot.vim",
  "nvim-treesitter/nvim-treesitter" , --syntax hightlight 
+ 'simrat39/symbols-outline.nvim', -- code outline
  "NvChad/nvim-colorizer.lua" , --color preview
  -- Language server and auto completion plugins
  "neovim/nvim-lspconfig" , -- built-in LSP
@@ -28,6 +30,12 @@ require("lazy").setup({
  "hrsh7th/cmp-buffer",
  "hrsh7th/cmp-path",
  "hrsh7th/cmp-cmdline",
+ "hrsh7th/cmp-vsnip",
+ "hrsh7th/vim-vsnip",
+ "SirVer/ultisnips",
+ "quangnguyen30192/cmp-nvim-ultisnips",
+ "dcampos/nvim-snippy",
+ "dcampos/cmp-snippy",
  "hrsh7th/nvim-cmp",
  "onsails/lspkind-nvim" , --auto completion icons
  "rcarriga/nvim-notify" , -- notification
@@ -49,13 +57,11 @@ require("lazy").setup({
 
  "nvim-lua/plenary.nvim" , -- don"t know what this it but needed for telescope
  "nvim-telescope/telescope.nvim" , -- fuzzy finder
- "danilamihailov/beacon.nvim", -- cursor tracker
  -- active window expander
  "anuvyklack/windows.nvim" ,
  "anuvyklack/middleclass",
  "anuvyklack/animation.nvim",
 
- "folke/which-key.nvim",-- show keybindings
 })
 
 EOF
@@ -111,7 +117,7 @@ noremap <silent> <C-d> :vertical resize -3<CR>
 " noremap <silent> <C-s> :resize -3<CR>
 
 "treesitter (syntax hightlight) and color scheme configs 
-au BufNewFile,BufRead *.sol setfiletype solidity
+" au BufNewFile,BufRead *.sol setfiletype solidity
 
 
 noremap <silent> <A-e> :lua MiniFiles.open() <CR>
@@ -124,7 +130,7 @@ lua << EOF
     vim.notify = require("notify")
     vim.notify.setup(
       {
-        fps = 20,
+        fps = 5,
         render = "default",
         stages = "slide",
         timeout = 3000,
@@ -173,26 +179,41 @@ lua require('nvim_comment').setup()
 
 " setup telescope
 lua require('telescope').setup()
-noremap <silent> <leader>li :Telescope live_grep <CR>
-noremap <silent> <leader>ff :Telescope current_buffer_fuzzy_find <CR>
-noremap <silent> <leader>op :Telescope find_files <CR>
+noremap <silent> <leader>lg :Telescope live_grep <CR>
+noremap <silent> <leader>fz :Telescope current_buffer_fuzzy_find <CR>
+noremap <silent> <leader>ff :Telescope find_files <CR>
 
 " airline (status bar) git branch display
-" let g:airline#extensions#branch#enabled = 1
+let g:airline#extensions#branch#enabled = 1
 
 " built in LSP keybindings and auto completion setup
-nnoremap <silent> gd <cmd>lua vim.lsp.buf.definition()<CR>
-nnoremap <silent> gD <cmd>lua vim.lsp.buf.declaration()<CR>
-nnoremap <silent> gr <cmd>lua vim.lsp.buf.references()<CR>
-nnoremap <silent> gi <cmd>lua vim.lsp.buf.implementation()<CR>
-nnoremap <silent> K <cmd>lua vim.lsp.buf.hover()<CR>
-nnoremap <silent> <F2> <cmd>lua vim.lsp.buf.rename()<CR>
-nnoremap <silent> <C-k> <cmd>lua vim.lsp.buf.signature_hlp()<CR>
-nnoremap <silent> <C-n> <cmd>lua vim.diagnostic.goto_next()<CR>
-nnoremap <silent> <C-p> <cmd>lua vim.diagnostic.goto_prev()<CR>
-nnoremap <silent> ca <cmd> :CodeActionMenu <CR>
+" Turn this block into lua copilot
+ " nnoremap <silent> gd <cmd>lua vim.lsp.buf.definition()<CR>
+ " nnoremap <silent> gD <cmd>lua vim.lsp.buf.declaration()<CR>
+ " nnoremap <silent> gr <cmd>lua vim.lsp.buf.references()<CR>
+ " nnoremap <silent> gi <cmd>lua vim.lsp.buf.implementation()<CR>
+ " nnoremap <silent> K <cmd>lua vim.lsp.buf.hover()<CR>
+ " nnoremap <silent> <F2> <cmd>lua vim.lsp.buf.rename()<CR>
+ " nnoremap <silent> <C-k> <cmd>lua vim.lsp.buf.signature_hlp()<CR>
+ " nnoremap <silent> <C-n> <cmd>lua vim.diagnostic.goto_next()<CR>
+ " nnoremap <silent> <C-p> <cmd>lua vim.diagnostic.goto_prev()<CR>
+ " nnoremap <silent> ca <cmd> :CodeActionMenu <CR>
+""
 
 lua << EOF
+-- fix this block to work
+local keymap = vim.api.nvim_set_keymap
+local opts = {noremap = true, silent = true}
+keymap('n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
+keymap('n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+keymap('n', 'gr', '<Cmd>lua vim.lsp.buf.references()<CR>', opts)
+keymap('n', 'gi', '<Cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+keymap('n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
+keymap('n', '<F2>', '<Cmd>lua vim.lsp.buf.rename()<CR>', opts)
+keymap('n', '<C-k>', '<Cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
+keymap('n', '<C-n>', '<Cmd>lua vim.diagnostic.goto_next()<CR>', opts)
+keymap('n', '<C-p>', '<Cmd>lua vim.diagnostic.goto_prev()<CR>', opts)
+keymap('n', 'ca', '<Cmd>:CodeActionMenu<CR>', opts)
 vim.fn.sign_define("DiagnosticSignError", { text = "", texthl = "DiagnosticSignError" })
 vim.fn.sign_define("DiagnosticSignWarn", { text = "", texthl = "DiagnosticSignWarn" })
 vim.fn.sign_define("DiagnosticSignInformation", { text = "", texthl = "DiagnosticSignInfo" })
@@ -246,9 +267,9 @@ require("bufferline").setup{
     diagnostics = "nvim_lsp"
   }
 }
+require("symbols-outline").setup()
 EOF
 
 source ~/.config/nvim/debugger.vim
-source ~/.config/nvim/copilot.vim
 source ~/.config/nvim/nvimCmp.lua
 
