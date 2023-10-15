@@ -50,7 +50,7 @@ require("lazy").setup({
  "APZelos/blamer.nvim" , -- git blame
  "vim-airline/vim-airline" , --status bar
  "lukas-reineke/indent-blankline.nvim" , --indent indicator
- "kyazdani42/nvim-web-devicons" , --colored icons
+ "nvim-tree/nvim-web-devicons" , --colored icons
  "akinsho/bufferline.nvim" , --visual studio code styles tabs
  "ryanoasis/vim-devicons" , --icons
  "kyazdani42/nvim-tree.lua" , -- file explorer
@@ -61,7 +61,13 @@ require("lazy").setup({
  "anuvyklack/windows.nvim" ,
  "anuvyklack/middleclass",
  "anuvyklack/animation.nvim",
-
+  {
+      'goolord/alpha-nvim',
+      dependencies = { 'nvim-tree/nvim-web-devicons' },
+      config = function ()
+          require'alpha'.setup(require'alpha.themes.startify'.config)
+      end
+  }
 })
 
 EOF
@@ -166,7 +172,7 @@ highlight CursorLineNr guifg=#ffffff guibg=NONE
 highlight LineNr guibg=NONE guifg=#a6a4a4
 highlight WinSeparator guifg=#ffffff
 highlight SignColumn guibg=NONE
-" highlight NonText guibg=none
+highlight NonText guibg=none
 """"""""""""""""""""
 " git blame
 """"""""""""""""""""
@@ -180,8 +186,8 @@ lua require('nvim_comment').setup()
 " setup telescope
 lua require('telescope').setup()
 noremap <silent> <leader>lg :Telescope live_grep <CR>
-noremap <silent> <leader>fz :Telescope current_buffer_fuzzy_find <CR>
-noremap <silent> <leader>ff :Telescope find_files <CR>
+noremap <silent> <leader>bf :Telescope current_buffer_fuzzy_find <CR>
+noremap <silent> <leader>pf :Telescope find_files <CR>
 
 " airline (status bar) git branch display
 let g:airline#extensions#branch#enabled = 1
@@ -201,7 +207,6 @@ let g:airline#extensions#branch#enabled = 1
 ""
 
 lua << EOF
--- fix this block to work
 local keymap = vim.api.nvim_set_keymap
 local opts = {noremap = true, silent = true}
 keymap('n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
@@ -227,7 +232,6 @@ require("mason").setup()
 require("mason-lspconfig").setup({
     ensure_installed = {
       'tsserver', 
-      'eslint', 
       'cssls',
       'vimls',
       'clangd',
@@ -235,7 +239,8 @@ require("mason-lspconfig").setup({
       'pylsp',
       'csharp_ls',
       'omnisharp_mono',
-      'rust_analyzer'
+      'rust_analyzer',
+      'jdtls',
     }
 })
 -- local lsp = require "lspconfig"
@@ -268,8 +273,10 @@ require("bufferline").setup{
   }
 }
 require("symbols-outline").setup()
+
+
 EOF
 
 source ~/.config/nvim/debugger.vim
 source ~/.config/nvim/nvimCmp.lua
-
+source ~/.config/nvim/splash.lua

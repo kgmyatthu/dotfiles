@@ -143,9 +143,9 @@ local cmp_kinds = {
   require('lspconfig')['tsserver'].setup {
     capabilities = capabilities
   }
-  require('lspconfig')['eslint'].setup {
-    capabilities = capabilities
-  }
+  -- require('lspconfig')['eslint'].setup {
+  --   capabilities = capabilities
+  -- }
   require('lspconfig')['clangd'].setup {
     capabilities = capabilities
   }
@@ -162,5 +162,8 @@ local cmp_kinds = {
     capabilities = capabilities
   }
   require('lspconfig')['vimls'].setup {
+    capabilities = capabilities
+  }
+  require('lspconfig')['jdtls'].setup {
     capabilities = capabilities
   }
