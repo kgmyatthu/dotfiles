@@ -12,8 +12,8 @@ env:
 window:
   # Spread additional padding evenly around the terminal content.
   padding:
-    x: 5
-    y: 5
+    x: 0
+    y: 0
   # Remove buttons
   decorations: none
   # Open in full screen 
@@ -24,20 +24,26 @@ window:
     lines: 38
 
 # Make background slightly transparent
-background_opacity: 0.8
+# background_opacity: 0.8
 
 cursor:
   # Block Underline or Beam
   style: Block
 
 font:
+  offset:
+    x: 2
+    y: 0
   normal:
-    family: FiraCode Nerd Font 
+    # family: JetBrainsMono Nerd Font 
+    family: CozetteVector
     # family: UbuntuMono Nerd Font
-  size: 8.5
+  size: 14
+
+    
 
   # Better font rendering for mac
-  use_thin_strokes: true
+  # use_thin_strokes: true
 
 # Colors (Hyper)
 colors:

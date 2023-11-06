@@ -1,4 +1,3 @@
-lua << EOF
 vim.keymap.set("n", "<leader>dg", ":lua require'dap'.continue()<CR>")
 vim.keymap.set("n", "<F5>", ":lua require'dap'.step_over()<CR>")
 vim.keymap.set("n", "<F4>", ":lua require'dap'.step_into()<CR>")
@@ -131,7 +130,7 @@ dap.configurations.typescript = {
    -- 💀
    -- Wait for codelldb to get ready and start listening before telling nvim-dap to connect
    -- If you get connect errors, try to increase 500 to a higher value, or check the stderr (Open the REPL)
-   vim.defer_fn(function() on_adapter(adapter) end, 1000)
+   vim.defer_fn(function() on_adapter(adapter) end, 2000)
  end
  
  -- don't forget to compile/build with debug symbols, otherwise it won't work.
@@ -140,16 +139,13 @@ dap.configurations.typescript = {
      name = "runit",
      type = "codelldb",
      request = "launch",
- 
      program = function()
-       return vim.fn.input('', vim.fn.getcwd() , 'file')
+       return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
      end,
- 
      args = {"--log_level=all"},
      cwd = "${workspaceFolder}",
      stopOnEntry = false,
      terminal = 'integrated',
- 
      pid = function()
              local handle = io.popen('pgrep hw$')
              local result = handle:read()
@@ -177,4 +173,3 @@ dap.listeners.before.event_exited["dapui_config"] = function()
   dapui.close()
 end
 vim.keymap.set("n", "<leader>dc", ":lua require'dapui'.close()<CR>")
-EOF

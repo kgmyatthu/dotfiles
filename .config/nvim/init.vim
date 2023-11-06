@@ -126,7 +126,7 @@ noremap <silent> <C-d> :vertical resize -3<CR>
 " au BufNewFile,BufRead *.sol setfiletype solidity
 
 
-noremap <silent> <A-e> :lua MiniFiles.open() <CR>
+noremap <silent> <leader>e :lua MiniFiles.open() <CR>
 lua << EOF
 require('mini.files').setup()
 require('mini.indentscope').setup()
@@ -162,6 +162,7 @@ lua << EOF
 
 EOF
 
+" convert to lua copilot
 set termguicolors 
 syntax on
 colorscheme default
@@ -214,7 +215,8 @@ keymap('n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
 keymap('n', 'gr', '<Cmd>lua vim.lsp.buf.references()<CR>', opts)
 keymap('n', 'gi', '<Cmd>lua vim.lsp.buf.implementation()<CR>', opts)
 keymap('n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
-keymap('n', '<F2>', '<Cmd>lua vim.lsp.buf.rename()<CR>', opts)
+--rename or replace rn
+keymap('n', 'Rn', '<Cmd>lua vim.lsp.buf.rename()<CR>', opts)
 keymap('n', '<C-k>', '<Cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
 keymap('n', '<C-n>', '<Cmd>lua vim.diagnostic.goto_next()<CR>', opts)
 keymap('n', '<C-p>', '<Cmd>lua vim.diagnostic.goto_prev()<CR>', opts)
@@ -241,6 +243,7 @@ require("mason-lspconfig").setup({
       'omnisharp_mono',
       'rust_analyzer',
       'jdtls',
+      'gopls',
     }
 })
 -- local lsp = require "lspconfig"
@@ -277,6 +280,6 @@ require("symbols-outline").setup()
 
 EOF
 
-source ~/.config/nvim/debugger.vim
+source ~/.config/nvim/debugger.lua
 source ~/.config/nvim/nvimCmp.lua
 source ~/.config/nvim/splash.lua

@@ -146,6 +146,7 @@ local cmp_kinds = {
   -- require('lspconfig')['eslint'].setup {
   --   capabilities = capabilities
   -- }
+  capabilities.offsetEncoding = { "utf-16" }
   require('lspconfig')['clangd'].setup {
     capabilities = capabilities
   }
@@ -165,5 +166,8 @@ local cmp_kinds = {
     capabilities = capabilities
   }
   require('lspconfig')['jdtls'].setup {
+    capabilities = capabilities
+  }
+  require('lspconfig')['gopls'].setup {
     capabilities = capabilities
   }
