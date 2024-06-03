@@ -16,8 +16,7 @@ window:
     y: 0
   # Remove buttons
   decorations: none
-  # Open in full screen 
-  # startup_mode: Maximized
+  # Open in full screen startup_mode: Maximized
   # Dimensions if not SimpleFullscreen
   dimensions:
     columns: 140
@@ -32,13 +31,17 @@ cursor:
 
 font:
   offset:
-    x: 2
+    x: 1
     y: 0
   normal:
-    # family: JetBrainsMono Nerd Font 
-    family: CozetteVector
+      family: cozette
     # family: UbuntuMono Nerd Font
-  size: 14
+  #
+  bold:
+    family: FiraCode Nerd Font Mono
+    style: Bold
+
+  size: 9
 
     
 

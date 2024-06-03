@@ -61,6 +61,7 @@ require("lazy").setup({
  "anuvyklack/windows.nvim" ,
  "anuvyklack/middleclass",
  "anuvyklack/animation.nvim",
+ "BlackLight/nvim-http",
   {
       'goolord/alpha-nvim',
       dependencies = { 'nvim-tree/nvim-web-devicons' },
@@ -155,7 +156,7 @@ lua << EOF
     highlight = {
       enable = true,              -- false will disable the whole extension
       disable = function(lang, bufnr) 
-        return vim.api.nvim_buf_line_count(bufnr) > 5000
+        return vim.api.nvim_buf_line_count(bufnr) > 10000
       end,
     },
   }  
@@ -239,7 +240,6 @@ require("mason-lspconfig").setup({
       'clangd',
       'pyright',
       'pylsp',
-      'csharp_ls',
       'omnisharp_mono',
       'rust_analyzer',
       'jdtls',
