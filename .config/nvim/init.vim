@@ -18,6 +18,7 @@ require("lazy").setup({
 { 'echasnovski/mini.indentscope', version = '*' }, --scop visualier
  --"zbirenbaum/copilot.lua" , -- github copilot
  "github/copilot.vim",
+ 
  "nvim-treesitter/nvim-treesitter" , --syntax hightlight 
  'simrat39/symbols-outline.nvim', -- code outline
  "NvChad/nvim-colorizer.lua" , --color preview
@@ -32,16 +33,14 @@ require("lazy").setup({
  "hrsh7th/cmp-cmdline",
  "hrsh7th/cmp-vsnip",
  "hrsh7th/vim-vsnip",
- "SirVer/ultisnips",
- "quangnguyen30192/cmp-nvim-ultisnips",
  "dcampos/nvim-snippy",
  "dcampos/cmp-snippy",
  "hrsh7th/nvim-cmp",
+ "aznhe21/actions-preview.nvim",
  "onsails/lspkind-nvim" , --auto completion icons
  "rcarriga/nvim-notify" , -- notification
 -- "ms-jpq/coq_nvim",  --auto completion tool
 -- "ms-jpq/coq.artifacts", -- 9000+ snippet
- "weilbith/nvim-code-action-menu" , --codeaction menu
  "tpope/vim-sleuth" , --auto indent space detector
  "mfussenegger/nvim-dap" , --debugging support 
  "rcarriga/nvim-dap-ui" , --nvim-dap ui support
@@ -61,13 +60,18 @@ require("lazy").setup({
  "anuvyklack/windows.nvim" ,
  "anuvyklack/middleclass",
  "anuvyklack/animation.nvim",
- "BlackLight/nvim-http",
   {
       'goolord/alpha-nvim',
       dependencies = { 'nvim-tree/nvim-web-devicons' },
       config = function ()
           require'alpha'.setup(require'alpha.themes.startify'.config)
       end
+  },
+  {
+      "3rd/diagram.nvim", -- render mermaid diagrams in neovim
+      dependencies = {
+        "3rd/image.nvim"
+      }
   }
 })
 
@@ -134,15 +138,15 @@ require('mini.indentscope').setup()
 EOF
 
 lua << EOF
-    vim.notify = require("notify")
-    vim.notify.setup(
-      {
-        fps = 5,
-        render = "default",
-        stages = "slide",
-        timeout = 3000,
-      }
-    );
+    -- vim.notify = require("notify")
+    -- vim.notify.setup(
+    --   {
+    --     fps = 5,
+    --     render = "default",
+    --     stages = "slide",
+    --     timeout = 3000,
+    --   }
+    -- );
   require'windows'.setup({
     autowidth = {			--		       |windows.autowidth|
         winwidth = 1.4,			--		        |windows.winwidth|
@@ -151,12 +155,12 @@ lua << EOF
     require'colorizer'.setup()
 
   require'nvim-treesitter.configs'.setup {
-    -- ensure_installed = "all", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
+    ensure_installed = "all", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
     autotag = {enable = true},
     highlight = {
       enable = true,              -- false will disable the whole extension
       disable = function(lang, bufnr) 
-        return vim.api.nvim_buf_line_count(bufnr) > 10000
+        return vim.api.nvim_buf_line_count(bufnr) > 5000
       end,
     },
   }  
@@ -166,7 +170,7 @@ EOF
 " convert to lua copilot
 set termguicolors 
 syntax on
-colorscheme default
+colorscheme vim
 highlight Normal guibg=#00003f
 highlight Pmenu guibg=#0300b3 guifg=#00FFFF
 highlight PmenuSel guibg=#00FFFF guifg=#000000
@@ -189,7 +193,7 @@ lua require('nvim_comment').setup()
 lua require('telescope').setup()
 noremap <silent> <leader>lg :Telescope live_grep <CR>
 noremap <silent> <leader>bf :Telescope current_buffer_fuzzy_find <CR>
-noremap <silent> <leader>pf :Telescope find_files <CR>
+noremap <silent> <leader>fi :Telescope find_files <CR>
 
 " airline (status bar) git branch display
 let g:airline#extensions#branch#enabled = 1
@@ -221,7 +225,7 @@ keymap('n', 'Rn', '<Cmd>lua vim.lsp.buf.rename()<CR>', opts)
 keymap('n', '<C-k>', '<Cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
 keymap('n', '<C-n>', '<Cmd>lua vim.diagnostic.goto_next()<CR>', opts)
 keymap('n', '<C-p>', '<Cmd>lua vim.diagnostic.goto_prev()<CR>', opts)
-keymap('n', 'ca', '<Cmd>:CodeActionMenu<CR>', opts)
+vim.keymap.set({ "v", "n" }, "ca", require("actions-preview").code_actions)
 vim.fn.sign_define("DiagnosticSignError", { text = "", texthl = "DiagnosticSignError" })
 vim.fn.sign_define("DiagnosticSignWarn", { text = "", texthl = "DiagnosticSignWarn" })
 vim.fn.sign_define("DiagnosticSignInformation", { text = "", texthl = "DiagnosticSignInfo" })
@@ -234,15 +238,10 @@ require("mason").setup()
 
 require("mason-lspconfig").setup({
     ensure_installed = {
-      'tsserver', 
-      'cssls',
-      'vimls',
+      'ts_ls', 
       'clangd',
-      'pyright',
-      'pylsp',
-      'omnisharp_mono',
       'rust_analyzer',
-      'jdtls',
+      "lua_ls",
       'gopls',
     }
 })
@@ -277,9 +276,85 @@ require("bufferline").setup{
 }
 require("symbols-outline").setup()
 
+require("actions-preview").setup {
+  telescope = {
+    sorting_strategy = "ascending",
+    layout_strategy = "vertical",
+    layout_config = {
+      width = 0.8,
+      height = 0.9,
+      prompt_position = "top",
+      preview_cutoff = 20,
+      preview_height = function(_, _, max_lines)
+        return max_lines - 15
+      end,
+    },
+  },
+}
 
 EOF
 
-source ~/.config/nvim/debugger.lua
+lua << EOF
+-- render mermaid in neovim for markdowns
+require("image").setup({
+  backend = "ueberzug",
+  processor = "magick_cli", -- or "magick_cli"
+  integrations = {
+    markdown = {
+      enabled = true,
+      clear_in_insert_mode = false,
+      download_remote_images = true,
+      only_render_image_at_cursor = false,
+      floating_windows = false, -- if true, images will be rendered in floating markdown windows
+      filetypes = { "markdown", "vimwiki" }, -- markdown extensions (ie. quarto) can go here
+    },
+    neorg = {
+      enabled = true,
+      filetypes = { "norg" },
+    },
+    typst = {
+      enabled = true,
+      filetypes = { "typst" },
+    },
+    html = {
+      enabled = false,
+    },
+    css = {
+      enabled = false,
+    },
+  },
+  max_width = nil,
+  max_height = nil,
+  max_width_window_percentage = nil,
+  max_height_window_percentage = 50,
+  window_overlap_clear_enabled = false, -- toggles images when windows are overlapped
+  window_overlap_clear_ft_ignore = { "cmp_menu", "cmp_docs", "snacks_notif", "scrollview", "scrollview_sign" },
+  editor_only_render_when_focused = false, -- auto show/hide images when the editor gains/looses focus
+  tmux_show_only_in_active_window = false, -- auto show/hide images in the correct Tmux window (needs visual-activity off)
+  hijack_file_patterns = { "*.png", "*.jpg", "*.jpeg", "*.gif", "*.webp", "*.avif" }, -- render image files as images when opened
+})require("diagram").setup({
+  integrations = {
+    require("diagram.integrations.markdown"),
+    require("diagram.integrations.neorg"),
+  },
+  renderer_options = {
+    mermaid = {
+      theme = "default",
+    },
+    plantuml = {
+      charset = "utf-8",
+    },
+    d2 = {
+      theme_id = 1,
+    },
+    gnuplot = {
+      theme = "dark",
+      size = "800,600",
+    },
+  },
+})
+EOF
+
+" source ~/.config/nvim/debugger.lua
 source ~/.config/nvim/nvimCmp.lua
 source ~/.config/nvim/splash.lua
