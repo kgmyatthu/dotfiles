@@ -47,7 +47,11 @@ require("lazy").setup({
  "theHamsta/nvim-dap-virtual-text",
  "terrortylor/nvim-comment" , -- comment toggler
  "APZelos/blamer.nvim" , -- git blame
- "vim-airline/vim-airline" , --status bar
+{
+    'nvim-lualine/lualine.nvim',
+    dependencies = { 'nvim-tree/nvim-web-devicons' }
+},
+ --"vim-airline/vim-airline" , --status bar // causing some problem clipping the text, very annoying
  "lukas-reineke/indent-blankline.nvim" , --indent indicator
  "nvim-tree/nvim-web-devicons" , --colored icons
  "akinsho/bufferline.nvim" , --visual studio code styles tabs
@@ -154,22 +158,46 @@ lua << EOF
   })
     require'colorizer'.setup()
 
-  require'nvim-treesitter.configs'.setup {
-    ensure_installed = "all", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
-    autotag = {enable = true},
-    highlight = {
-      enable = true,              -- false will disable the whole extension
-      disable = function(lang, bufnr) 
-        return vim.api.nvim_buf_line_count(bufnr) > 5000
-      end,
-    },
-  }  
+	require'nvim-treesitter.configs'.setup {
+	  -- A list of parser names, or "all" (the listed parsers MUST always be installed)
+	  ensure_installed = { "c", "cpp", "go", "rust", "typescript", "javascript" },
 
+	  -- Install parsers synchronously (only applied to `ensure_installed`)
+	  sync_install = false,
+
+	  -- Automatically install missing parsers when entering buffer
+	  -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
+	  auto_install = true,
+
+	  highlight = {
+	    enable = true,
+	    use_languagetree = true,
+
+	    -- NOTE: these are the names of the parsers and not the filetype. (for example if you want to
+	    -- disable highlighting for the `tex` filetype, you need to include `latex` in this list as this is
+	    -- the name of the parser)
+	    -- list of language that will be disabled
+	    -- Or use a function for more flexibility, e.g. to disable slow treesitter highlight for large files
+	    disable = function(lang, buf)
+		local max_filesize = 100 * 1024 -- 100 KB
+		local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+		if ok and stats and stats.size > max_filesize then
+		    return true
+		end
+	    end,
+
+	    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+	    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+	    -- Using this option may slow down your editor, and you may see some duplicate highlights.
+	    -- Instead of true it can also be a list of languages
+	    additional_vim_regex_highlighting = false,
+	  },
+	}
 EOF
 
 " convert to lua copilot
 set termguicolors 
-syntax on
+syntax off
 colorscheme vim
 highlight Normal guibg=#00003f
 highlight Pmenu guibg=#0300b3 guifg=#00FFFF
@@ -194,9 +222,6 @@ lua require('telescope').setup()
 noremap <silent> <leader>lg :Telescope live_grep <CR>
 noremap <silent> <leader>bf :Telescope current_buffer_fuzzy_find <CR>
 noremap <silent> <leader>fi :Telescope find_files <CR>
-
-" airline (status bar) git branch display
-let g:airline#extensions#branch#enabled = 1
 
 " built in LSP keybindings and auto completion setup
 " Turn this block into lua copilot
@@ -255,6 +280,7 @@ EOF
 nnoremap <silent> <A-n> :BufferLineCycleNext <CR>
 nnoremap <silent> <A-p> :BufferLineCyclePrev <CR>
 lua << EOF
+require("symbols-outline").setup()
 require("bufferline").setup{
   options = {
       numbers = function(opts)
@@ -263,19 +289,18 @@ require("bufferline").setup{
     show_buffer_close_icons = true,
     show_close_icon = true,
     tabsize = 25,
-    offsets = {
-                {
-                    filetype = "NvimTree",
-                    text = "File Explorer",
-                    highlight = "Directory",
-                    text_align = "center"
-                }
-                },
-    diagnostics = "nvim_lsp"
+    diagnostics = "nvim_lsp",
+    diagnostics_indicator = function(count, level, diagnostics_dict, context)
+      local s = " "
+      for e, n in pairs(diagnostics_dict) do
+	local sym = e == "error" and " "
+	  or (e == "warning" and " " or " ")
+	s = s .. n .. sym
+      end
+      return s
+      end
   }
 }
-require("symbols-outline").setup()
-
 require("actions-preview").setup {
   telescope = {
     sorting_strategy = "ascending",
@@ -332,7 +357,8 @@ require("image").setup({
   editor_only_render_when_focused = false, -- auto show/hide images when the editor gains/looses focus
   tmux_show_only_in_active_window = false, -- auto show/hide images in the correct Tmux window (needs visual-activity off)
   hijack_file_patterns = { "*.png", "*.jpg", "*.jpeg", "*.gif", "*.webp", "*.avif" }, -- render image files as images when opened
-})require("diagram").setup({
+})
+require("diagram").setup({
   integrations = {
     require("diagram.integrations.markdown"),
     require("diagram.integrations.neorg"),
@@ -353,6 +379,9 @@ require("image").setup({
     },
   },
 })
+require("lualine").setup{
+  options = { theme = 'powerline_dark' } 
+}
 EOF
 
 " source ~/.config/nvim/debugger.lua
