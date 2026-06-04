@@ -133,25 +133,34 @@ local cmp_kinds = {
     })
   })
 
-  -- Set up lspconfig.
-  local capabilities = require('cmp_nvim_lsp').default_capabilities()
-  -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
-  require('lspconfig')['ts_ls'].setup {
-    capabilities = capabilities
-  }
-  -- require('lspconfig')['eslint'].setup {
+  -- -- Set up lspconfig.
+  -- local capabilities = require('cmp_nvim_lsp').default_capabilities()
+  -- -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
+  -- require('lspconfig')['ts_ls'].setup {
   --   capabilities = capabilities
   -- }
-  capabilities.offsetEncoding = { "utf-16" }
-  require('lspconfig')['clangd'].setup {
-    capabilities = capabilities
-  }
-  require('lspconfig')['rust_analyzer'].setup {
-    capabilities = capabilities
-  }
-  require('lspconfig')['lua_ls'].setup {
-    capabilities = capabilities
-  }
-  require('lspconfig')['gopls'].setup {
-    capabilities = capabilities
-  }
+  -- -- require('lspconfig')['eslint'].setup {
+  -- --   capabilities = capabilities
+  -- -- }
+  -- capabilities.offsetEncoding = { "utf-16" }
+  -- require('lspconfig')['clangd'].setup {
+  --   capabilities = capabilities
+  -- }
+  -- require('lspconfig')['rust_analyzer'].setup {
+  --   capabilities = capabilities,
+  --   on_attach = function(client, bufnr)
+  --       navic.attach(client, bufnr)
+  --   end
+  -- }
+  -- require('lspconfig')['lua_ls'].setup {
+  --   capabilities = capabilities
+  -- }
+  -- require('lspconfig')['gopls'].setup {
+  --   capabilities = capabilities
+  -- }
+  -- require('lspconfig')['solidity'].setup {
+  --   capabilities = capabilities
+  -- }
+  -- require('lspconfig')['harper-ls'].setup {
+  --   capabilities = capabilities
+  -- }
